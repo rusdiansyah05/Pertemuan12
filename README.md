@@ -1,26 +1,35 @@
-##build_embeddings.py
+//build_embeddings.py
+
 Kode build_embeddings.py berfungsi untuk mengekstraksi embedding wajah dari dataset pelatihan secara otomatis dengan membaca setiap folder kelas di dalam direktori data/train, kemudian memproses seluruh gambar menggunakan fungsi embed_from_path untuk menghasilkan embedding berukuran 512 dimensi; gambar yang tidak terdeteksi wajahnya akan dicatat dalam daftar bad, sedangkan embedding yang valid disimpan dalam array X dan labelnya disimpan dalam array y, sebelum akhirnya kedua array tersebut disimpan sebagai file X_train.npy dan y_train.npy, serta program menampilkan jumlah total embedding, label, dan gambar yang gagal diproses untuk memastikan dataset siap digunakan pada tahap pelatihan model pengenalan wajah seperti KNN atau SVM.
 
-##eval_folder.py
+eval_folder.py
+
 Kode eval_folder.py digunakan untuk mengevaluasi performa model FaceNet + SVM dengan cara membaca seluruh gambar dalam folder validasi data/val, menghitung embedding menggunakan embed_from_path, lalu memprediksi kelas menggunakan model SVM yang sebelumnya dimuat dari facenet_svm.joblib. Setiap prediksi dibandingkan dengan label folder aslinya untuk menghitung akurasi keseluruhan, sekaligus mencatat performa per kelas melalui struktur defaultdict. Untuk setiap gambar yang berhasil diekstraksi embedding-nya, program menyimpan label benar (Y_true) dan label prediksi (Y_pred), lalu menghitung akurasi global menggunakan perbandingan array boolean, serta menampilkan akurasi per kelas dalam format jumlah benar, total sampel, dan rasio keberhasilan. Dengan demikian, skrip ini memberikan gambaran kuantitatif seberapa akurat model mengenali wajah pada dataset uji berdasarkan struktur folder validasi yang kamu gunakan.
 ##predict_one.py##
 Kode ini berfungsi untuk melakukan prediksi wajah pada satu gambar menggunakan model SVM yang sebelumnya dilatih dan disimpan dalam file facenet_svm.joblib. Proses dimulai dengan memuat embedding dari gambar melalui fungsi embed_from_path, dan apabila tidak ada wajah yang terdeteksi maka fungsi langsung mengembalikan label "NO_FACE" dengan confidence 0.0. Jika embedding berhasil diperoleh, embedding diratakan dan dibentuk ulang menjadi vektor 2D sebelum dimasukkan ke model. Prediksi kelas dilakukan dengan clf.predict, sedangkan nilai confidence dihitung menggunakan clf.predict_proba, di mana nilai probabilitas tertinggi dianggap sebagai tingkat keyakinan model. Pada bagian utama, script menguji satu gambar contoh dan menampilkan label hasil prediksi beserta confidence, sehingga kode ini sangat berguna untuk melakukan pengecekan cepat terhadap kualitas model FaceNet + SVM pada satu gambar secara individual.
 
 ##train_classifier.py
+
 Kode train_classifier.py digunakan untuk melatih model klasifikasi wajah menggunakan SVM dengan kernel RBF pada dataset yang sudah diekstraksi embedding-nya dan disimpan dalam file X_train.npy dan y_train.npy. Model SVM dibangun dengan menggunakan pipeline, yang pertama-tama melakukan standarisasi fitur dengan StandardScaler sebelum diteruskan ke SVM dengan parameter yang telah disesuaikan (C=10, gamma="scale", dan class_weight="balanced"). Setelah pelatihan selesai, model disimpan dalam file facenet_svm.joblib menggunakan joblib.dump. Akhirnya, akurasi pelatihan dihitung secara manual dengan membandingkan prediksi model terhadap label yang sebenarnya dan mencetak nilai akurasi, memberikan gambaran langsung tentang seberapa baik model bekerja pada data pelatihan yang ada.
+
 ##train_knn.py##
+
 Kode train_knn.py digunakan untuk melatih model K-Nearest Neighbors (KNN) pada dataset embedding wajah yang telah disimpan dalam file X_train.npy dan y_train.npy. Model KNN dibangun menggunakan pipeline yang pertama-tama melakukan standarisasi fitur dengan StandardScaler sebelum diteruskan ke klasifikasi KNN dengan parameter jumlah tetangga (k=3) dan menggunakan metrik jarak Euclidean. Setelah proses pelatihan selesai, model yang telah dilatih disimpan dalam file facenet_knn.joblib menggunakan joblib.dump, memungkinkan model untuk digunakan pada tahap prediksi tanpa perlu melatih ulang.
 
-##utils_facenet.py
+utils_facenet.py
+
 Kode utils_facenet.py berfungsi untuk mempersiapkan dan mengekstraksi fitur wajah menggunakan model FaceNet. Dimulai dengan memuat model MTCNN untuk mendeteksi dan menyelaraskan wajah, serta model InceptionResnetV1 sebagai embedder untuk menghasilkan embedding wajah berukuran 512 dimensi. Proses dimulai dengan membaca gambar menggunakan OpenCV (read_img_bgr), lalu mengonversi gambar dari format BGR ke RGB. Setelah itu, wajah pada gambar diselaraskan menggunakan MTCNN (face_align). Jika wajah terdeteksi, gambar yang diselaraskan dikirimkan ke embedder untuk menghasilkan embedding menggunakan metode embed_face_tensor. Fungsi embed_from_path menggabungkan proses tersebut untuk mengekstraksi embedding wajah dari gambar berdasarkan path file. Selain itu, fungsi cosine_similarity digunakan untuk menghitung kesamaan antara dua embedding wajah dengan menghitung nilai dot product setelah normalisasi, yang dapat digunakan untuk membandingkan wajah dalam sistem pengenalan wajah.
 
-##verify_cli.py
+verify_cli.py
+
 Kode verify_cli.py digunakan untuk melakukan verifikasi wajah 1:1 dengan membandingkan dua gambar yang diberikan melalui argumen command-line. Menggunakan argparse, pengguna dapat memberikan dua gambar melalui path (img1 dan img2), serta optional threshold (--th) untuk menentukan batas kesamaan wajah. Kode ini kemudian memuat embedding wajah dari kedua gambar menggunakan fungsi embed_from_path, dan jika salah satu gambar tidak memiliki wajah yang terdeteksi, maka akan muncul pesan error. Jika kedua gambar memiliki wajah yang terdeteksi, kode akan menghitung kesamaan antar embedding dengan menggunakan fungsi cosine_similarity. Berdasarkan nilai kesamaan yang dihitung, sistem akan memberikan hasil "MATCH" atau "NO MATCH" sesuai dengan threshold yang ditentukan, yang memungkinkan untuk mengevaluasi apakah kedua wajah tersebut berasal dari orang yang sama atau tidak.
 
-##verify_cli.py
+verify_cli.py
+
 Kode verify_cli.py digunakan sebagai alat verifikasi wajah berbasis command line, yang memungkinkan pengguna membandingkan dua gambar wajah untuk menentukan apakah keduanya merupakan orang yang sama. Program menerima dua argumen berupa path gambar (img1 dan img2) serta opsi threshold kemiripan (--th) dengan nilai default 0.85. Setelah argumen diproses, skrip menghasilkan embedding untuk masing-masing gambar menggunakan fungsi embed_from_path() dari modul utils_facenet. Jika salah satu gambar tidak mengandung wajah yang terdeteksi, program langsung menampilkan pesan kesalahan. Jika kedua embedding berhasil dibuat, skrip menghitung nilai kemiripan menggunakan cosine_similarity(), yang mengukur seberapa dekat arah vektor embedding satu dengan lainnya. Nilai similarity kemudian dicetak, dan program mengambil keputusan dengan membandingkannya terhadap nilai threshold: jika similarity di atas atau sama dengan threshold, gambar dianggap sebagai "MATCH" (wajah sama), sedangkan jika lebih rendah maka dianggap "NO MATCH". Dengan demikian, skrip ini berfungsi sebagai alat verifikasi wajah sederhana namun efektif tanpa memerlukan model klasifikasi tambahan.
 
-##verify_pair.py
+verify_pair.py
+
 Kode verify_pair.py berfungsi untuk memverifikasi apakah dua gambar wajah milik orang yang sama dengan membandingkan kesamaan fitur wajah menggunakan cosine similarity. Gambar pertama dan kedua dimuat menggunakan fungsi embed_from_path, yang mengekstraksi embedding wajah dari kedua gambar tersebut. Jika wajah tidak terdeteksi pada salah satu gambar, maka kode akan menampilkan pesan kesalahan. Namun, jika kedua gambar berhasil diproses, kode menghitung nilai cosine similarity antara dua embedding wajah yang dihasilkan dan membandingkannya dengan threshold yang telah ditentukan (dalam hal ini, 0.85). Berdasarkan hasil perbandingan ini, kode akan mencetak hasil verifikasi berupa "YA" jika gambar memiliki kesamaan tinggi (match) atau "TIDAK" jika kesamaan rendah (no match).
 
 
