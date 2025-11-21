@@ -1,4 +1,4 @@
-//build_embeddings.py
+build_embeddings.py
 
 Kode build_embeddings.py berfungsi untuk mengekstraksi embedding wajah dari dataset pelatihan secara otomatis dengan membaca setiap folder kelas di dalam direktori data/train, kemudian memproses seluruh gambar menggunakan fungsi embed_from_path untuk menghasilkan embedding berukuran 512 dimensi; gambar yang tidak terdeteksi wajahnya akan dicatat dalam daftar bad, sedangkan embedding yang valid disimpan dalam array X dan labelnya disimpan dalam array y, sebelum akhirnya kedua array tersebut disimpan sebagai file X_train.npy dan y_train.npy, serta program menampilkan jumlah total embedding, label, dan gambar yang gagal diproses untuk memastikan dataset siap digunakan pada tahap pelatihan model pengenalan wajah seperti KNN atau SVM.
 
@@ -8,11 +8,11 @@ Kode eval_folder.py digunakan untuk mengevaluasi performa model FaceNet + SVM de
 ##predict_one.py##
 Kode ini berfungsi untuk melakukan prediksi wajah pada satu gambar menggunakan model SVM yang sebelumnya dilatih dan disimpan dalam file facenet_svm.joblib. Proses dimulai dengan memuat embedding dari gambar melalui fungsi embed_from_path, dan apabila tidak ada wajah yang terdeteksi maka fungsi langsung mengembalikan label "NO_FACE" dengan confidence 0.0. Jika embedding berhasil diperoleh, embedding diratakan dan dibentuk ulang menjadi vektor 2D sebelum dimasukkan ke model. Prediksi kelas dilakukan dengan clf.predict, sedangkan nilai confidence dihitung menggunakan clf.predict_proba, di mana nilai probabilitas tertinggi dianggap sebagai tingkat keyakinan model. Pada bagian utama, script menguji satu gambar contoh dan menampilkan label hasil prediksi beserta confidence, sehingga kode ini sangat berguna untuk melakukan pengecekan cepat terhadap kualitas model FaceNet + SVM pada satu gambar secara individual.
 
-##train_classifier.py
+train_classifier.py
 
 Kode train_classifier.py digunakan untuk melatih model klasifikasi wajah menggunakan SVM dengan kernel RBF pada dataset yang sudah diekstraksi embedding-nya dan disimpan dalam file X_train.npy dan y_train.npy. Model SVM dibangun dengan menggunakan pipeline, yang pertama-tama melakukan standarisasi fitur dengan StandardScaler sebelum diteruskan ke SVM dengan parameter yang telah disesuaikan (C=10, gamma="scale", dan class_weight="balanced"). Setelah pelatihan selesai, model disimpan dalam file facenet_svm.joblib menggunakan joblib.dump. Akhirnya, akurasi pelatihan dihitung secara manual dengan membandingkan prediksi model terhadap label yang sebenarnya dan mencetak nilai akurasi, memberikan gambaran langsung tentang seberapa baik model bekerja pada data pelatihan yang ada.
 
-##train_knn.py##
+train_knn.py##
 
 Kode train_knn.py digunakan untuk melatih model K-Nearest Neighbors (KNN) pada dataset embedding wajah yang telah disimpan dalam file X_train.npy dan y_train.npy. Model KNN dibangun menggunakan pipeline yang pertama-tama melakukan standarisasi fitur dengan StandardScaler sebelum diteruskan ke klasifikasi KNN dengan parameter jumlah tetangga (k=3) dan menggunakan metrik jarak Euclidean. Setelah proses pelatihan selesai, model yang telah dilatih disimpan dalam file facenet_knn.joblib menggunakan joblib.dump, memungkinkan model untuk digunakan pada tahap prediksi tanpa perlu melatih ulang.
 
