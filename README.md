@@ -12,7 +12,7 @@ train_classifier.py
 
 Kode train_classifier.py digunakan untuk melatih model klasifikasi wajah menggunakan SVM dengan kernel RBF pada dataset yang sudah diekstraksi embedding-nya dan disimpan dalam file X_train.npy dan y_train.npy. Model SVM dibangun dengan menggunakan pipeline, yang pertama-tama melakukan standarisasi fitur dengan StandardScaler sebelum diteruskan ke SVM dengan parameter yang telah disesuaikan (C=10, gamma="scale", dan class_weight="balanced"). Setelah pelatihan selesai, model disimpan dalam file facenet_svm.joblib menggunakan joblib.dump. Akhirnya, akurasi pelatihan dihitung secara manual dengan membandingkan prediksi model terhadap label yang sebenarnya dan mencetak nilai akurasi, memberikan gambaran langsung tentang seberapa baik model bekerja pada data pelatihan yang ada.
 
-train_knn.py##
+train_knn.py
 
 Kode train_knn.py digunakan untuk melatih model K-Nearest Neighbors (KNN) pada dataset embedding wajah yang telah disimpan dalam file X_train.npy dan y_train.npy. Model KNN dibangun menggunakan pipeline yang pertama-tama melakukan standarisasi fitur dengan StandardScaler sebelum diteruskan ke klasifikasi KNN dengan parameter jumlah tetangga (k=3) dan menggunakan metrik jarak Euclidean. Setelah proses pelatihan selesai, model yang telah dilatih disimpan dalam file facenet_knn.joblib menggunakan joblib.dump, memungkinkan model untuk digunakan pada tahap prediksi tanpa perlu melatih ulang.
 
